@@ -1,6 +1,7 @@
 package br.com.alura.forum.dto;
 
 import br.com.alura.forum.model.Topico;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +12,11 @@ import java.util.stream.Collectors;
 
 @Getter
 public class TopicoDto {
+
     private Long id;
     private String titulo;
     private String mensagem;
+    @JsonProperty("data_criacao")
     private LocalDateTime dataCriacao;
 
     public TopicoDto(Topico t){
