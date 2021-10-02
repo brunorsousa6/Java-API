@@ -8,6 +8,8 @@ import br.com.alura.forum.model.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -32,9 +34,9 @@ public class ForumController {
     CursoRepository cursoRepository;
 
     @GetMapping
+    @Cacheable(value = "listaDeTopicos")
     public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
                                  @PageableDefault(sort ="id", direction = Direction.ASC) Pageable paginacao) {
-
         if (nomeCurso == null) {
             Page<Topico> topicos = topicoRepository.findAll(paginacao);
             return TopicoDto.converter(topicos);
@@ -46,6 +48,7 @@ public class ForumController {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value ="listaDeTopicos", allEntries = true)
     public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
         Topico topico = form.converter(cursoRepository);
         topicoRepository.save(topico);
@@ -79,6 +82,7 @@ public class ForumController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value ="listaDeTopicos", allEntries = true)
     public ResponseEntity remover(@PathVariable Long id) {
         Optional<Topico> optional = topicoRepository.findById(id);
 
